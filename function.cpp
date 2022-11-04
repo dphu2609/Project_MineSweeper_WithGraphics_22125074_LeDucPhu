@@ -1,9 +1,10 @@
 #include <bits/stdc++.h>
 #include <graphics.h>
 #include "function.h"
- 
-using namespace std;
+#include <fstream>
+#include <time.h>
 
+using namespace std;
 
 void menu() {
     initwindow(600,600,"MineSweeper");
@@ -61,16 +62,36 @@ void newGame() {
         if (MouseLeft()) {
             GetCursorPos(&mouse);
             if (mouse.x>220 && mouse.x<380 && mouse.y>305 && mouse.y<345) play(9,9,10);
-            else if (mouse.x>180 && mouse.x<420 && mouse.y>345 && mouse.y<385) cout << "CONTINUE PLAYING" << endl;
-            else if (mouse.x>215 && mouse.x<385 && mouse.y>385 && mouse.y<425) cout << "HIGH SCORE" << endl;
+            else if (mouse.x>180 && mouse.x<420 && mouse.y>345 && mouse.y<385) play(16,16,40);
+            else if (mouse.x>215 && mouse.x<385 && mouse.y>385 && mouse.y<425) play(16,30,99);
             else if (mouse.x>255 && mouse.x<345 && mouse.y>425 && mouse.y<465) cout << "EXIT" << endl;
         }
         delay(100);
     }
 }
 
+void createDisplay(int height, int width) {
+    closegraph();
+    SquareSize=40;
+    countMark=0;
+    countMarkMatchBombs=0;
+    initwindow(width*SquareSize+240, height*SquareSize+240, "MineSweeper");
+    for (int i=0;i<height;i++) {
+        for (int j=0;j<width;j++) {
+            readimagefile("images\\unopened.gif",j*SquareSize+120,i*SquareSize+120,j*SquareSize+120+SquareSize,i*SquareSize+120+SquareSize);
+        }
+    }
+}
+
 void createAnswer(int height, int width, int bombs) {
     srand(time(0));
+    for (int i=0;i<16;i++) {
+        for (int j=0;j<30;j++) {
+            checkBlankCell[i][j]=false;
+            checkRandomBombs[i][j]=false;
+            display[i][j]='*';
+        }
+    }
     int count = 1;
     while (count <= bombs) {
         int i=rand()%height;
@@ -100,16 +121,93 @@ void createAnswer(int height, int width, int bombs) {
     }
 }
 
-void createDisplay(int height, int width) {
-    closegraph();
-    if (width<=16) SquareSize=40;
-    else SquareSize=30;
-    initwindow(width*SquareSize+240, height*SquareSize+240, "MineSweeper");
+void openNumCell(int x, int y) {
+    display[x][y]=answer[x][y];
+    if (answer[x][y]=='1') readimagefile("images\\num1.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
+    else if (answer[x][y]=='2') readimagefile("images\\num2.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
+    else if (answer[x][y]=='3') readimagefile("images\\num3.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
+    else if (answer[x][y]=='4') readimagefile("images\\num4.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
+    else if (answer[x][y]=='5') readimagefile("images\\num5.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
+    else if (answer[x][y]=='6') readimagefile("images\\num6.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
+    else if (answer[x][y]=='7') readimagefile("images\\num7.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
+    else if (answer[x][y]=='8') readimagefile("images\\num8.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
+}
+
+void openBlankCell(int i, int j, int height, int width) {
+    if (i<0|| i>height-1 || j<0 || j>width-1) return;
+    else if ((answer[i][j]==' ') && (checkBlankCell[i][j]==false)) {
+        readimagefile("images\\num0.jpg",j*SquareSize+120,i*SquareSize+120,j*SquareSize+120+SquareSize,i*SquareSize+120+SquareSize);
+        display[i-1][j-1]=answer[i-1][j-1];
+        display[i-1][j]=answer[i-1][j];
+        display[i-1][j+1]=answer[i-1][j+1];
+        display[i][j-1]=answer[i][j-1];
+        display[i][j]=answer[i][j];
+        display[i][j+1]=answer[i][j+1];
+        display[i+1][j-1]=answer[i+1][j-1];
+        display[i+1][j]=answer[i+1][j];
+        display[i+1][j+1]=answer[i+1][j+1];
+        checkBlankCell[i][j]=true;
+        openBlankCell(i,j-1,height,width);
+        openBlankCell(i,j+1,height,width);
+        openBlankCell(i+1,j,height,width);
+        openBlankCell(i-1,j,height,width);
+        openBlankCell(i-1,j-1,height,width);
+        openBlankCell(i-1,j+1,height,width);
+        openBlankCell(i+1,j-1,height,width);
+        openBlankCell(i+1,j+1,height,width);
+    } 
+    else if (answer[i][j]=='B') return;
+    else  {
+        openNumCell(i,j);
+        return;
+    }
+}
+
+void loseGame(int x, int y,int height, int width) {
+    readimagefile("images\\bomb.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
+    delay(500);
     for (int i=0;i<height;i++) {
         for (int j=0;j<width;j++) {
-            readimagefile("images\\unopened.gif",j*SquareSize+120,i*SquareSize+120,j*SquareSize+120+SquareSize,i*SquareSize+120+SquareSize);
+            if (answer[i][j]=='B') readimagefile("images\\bomb.jpg",j*SquareSize+120,i*SquareSize+120,j*SquareSize+120+SquareSize,i*SquareSize+120+SquareSize);
         }
     }
+    char a[20]="YOU LOSE";
+    settextstyle(EUROPEAN_FONT,HORIZ_DIR,5);
+    outtextxy((width*SquareSize+240)/2-140,height*SquareSize+240-90,a);
+}
+
+bool checkWin(int height, int width, int bombs) {
+    bool checkwin=1;
+    for (int i=0;i<height;i++) {
+        for (int j=0;j<width;j++) {
+            if (display[i][j]=='*') {
+                checkwin=0;
+                break;
+            }
+        }
+        if (checkwin==0) break;
+    }
+    return checkwin;
+}
+
+void clickOpenedNumCell(int x, int y, int height, int width) {
+    int countFlag=0;
+    for (int i=x-1;i<=x+1;i++) {
+        for (int j=y-1;j<=y+1;j++) {
+            if (display[i][j]=='P') countFlag++;
+        }
+    }
+    if (countFlag==(int)answer[x][y]-48) {
+        for (int i=x-1;i<=x+1;i++) {
+            for (int j=y-1;j<=y+1;j++) {
+                if (display[i][j]=='P') continue;
+                if (answer[i][j]==' ') openBlankCell(i,j,height,width);
+                else if (answer[i][j]=='B') loseGame(i,j,height,width);
+                else openNumCell(i,j);
+            }
+        }
+    }
+    else return;
 }
 
 void play(int height, int width, int bombs) {
@@ -117,21 +215,49 @@ void play(int height, int width, int bombs) {
     createDisplay(height,width);
     createAnswer(height,width,bombs);
     while(1) {
-        if (MouseLeft()) GetCursorPos(&mouse);
-        else continue;
-        x=(mouse.y-20-120)/SquareSize;
-        y=(mouse.x-120)/SquareSize;
-        if (answer[x][y]==' ') readimagefile("images\\num0.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
-        else if (answer[x][y]=='1') readimagefile("images\\num1.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
-        else if (answer[x][y]=='2') readimagefile("images\\num2.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
-        else if (answer[x][y]=='3') readimagefile("images\\num3.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
-        else if (answer[x][y]=='4') readimagefile("images\\num4.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
-        else if (answer[x][y]=='5') readimagefile("images\\num5.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
-        else if (answer[x][y]=='6') readimagefile("images\\num6.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
-        else if (answer[x][y]=='7') readimagefile("images\\num7.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
-        else if (answer[x][y]=='8') readimagefile("images\\num8.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
-        else if (answer[x][y]=='B') readimagefile("images\\bomb.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
         delay(100);
+        if (MouseLeft()) {
+            GetCursorPos(&mouse);
+            delay(50);
+            if (mouse.y-25-120<0) x=0;
+            else x=(mouse.y-25-120)/SquareSize;
+            if (mouse.x-120<0) y=0;
+            else if (mouse.x>SquareSize*width+120) y=width-1;
+            else y=(mouse.x-120)/SquareSize;
+            if (display[x][y]=='P') continue;
+            else if (display[x][y]!='*') clickOpenedNumCell(x,y,height,width);
+            if (answer[x][y]==' ') openBlankCell(x,y,height,width);
+            else if (answer[x][y]=='B') loseGame(x,y,height,width);
+            else openNumCell(x,y);
+        }
+        else if (MouseRight()) {
+            GetCursorPos(&mouse);
+            delay(50);
+            if (mouse.y-25-120<0) x=0;
+            else x=(mouse.y-25-120)/SquareSize;
+            if (mouse.x-120<0) y=0;
+            else if (mouse.x>SquareSize*width+120) y=width-1;
+            else y=(mouse.x-120)/SquareSize;
+            if (display[x][y]!='*' && display[x][y]!='P') continue;
+            else if (display[x][y]=='P') {
+                display[x][y]='*';
+                readimagefile("images\\unopened.gif",y*SquareSize+121,x*SquareSize+121,y*SquareSize+119+SquareSize,x*SquareSize+119+SquareSize);
+                countMark--;
+                if (answer[x][y]=='B') countMarkMatchBombs--;
+            }
+            else {
+                display[x][y]='P';
+                readimagefile("images\\flag.jpg",y*SquareSize+121,x*SquareSize+121,y*SquareSize+119+SquareSize,x*SquareSize+119+SquareSize);
+                countMark++;
+                if (answer[x][y]=='B') countMarkMatchBombs++;
+            }
+        }
+        if (countMark==bombs && countMarkMatchBombs==bombs) {
+            if (checkWin(height,width,bombs)) {
+                char a[20]="YOU WIN";
+                settextstyle(EUROPEAN_FONT,HORIZ_DIR,5);
+                outtextxy((width*SquareSize+240)/2-140,height*SquareSize+240-90,a);
+            }
+        }
     }
-    getch();
 }
