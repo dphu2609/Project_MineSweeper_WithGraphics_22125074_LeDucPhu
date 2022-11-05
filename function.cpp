@@ -101,6 +101,7 @@ void createAnswer(int height, int width, int bombs) {
             checkBlankCell[i][j]=false;
             checkRandomBombs[i][j]=false;
             display[i][j]='*';
+            answer[i][j]=' ';
         }
     }
     int count = 1;
