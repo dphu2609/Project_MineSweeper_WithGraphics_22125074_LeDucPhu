@@ -42,7 +42,6 @@ void menu() {
         }
         delay(100);
     }
-    closegraph();
 }
 
 void newGame() {
@@ -343,14 +342,14 @@ void loseGame(int x, int y,int height, int width, int bombs) {
     outtextxy((width*SquareSize+240)/2-15,(height*SquareSize+240)/2+20,d);
     while (isPlaying) {
         if (MouseLeft()) {
-            if ((mousex()>(width*SquareSize+240)/2-40) && (mousex()<(width*SquareSize+240)/2+40) && ((mousey()>height*SquareSize+240)/2-20) && ((mousey()<height*SquareSize+240)/2+10)) {
+            if ((mousex()>(width*SquareSize+240)/2-40) && (mousex()<(width*SquareSize+240)/2+40) && (mousey()>(height*SquareSize+240)/2-20) && (mousey()<(height*SquareSize+240)/2+10)) {
                 playAgain=true;
                 isPlaying=false;
                 againHeight=height;
                 againWidth=width;
                 againBombs=bombs;
             }
-            else if ((mousex()>(width*SquareSize+240)/2-30) && (mousex()<(width*SquareSize+240)/2+30) && ((mousey()>height*SquareSize+240)/2+10) && ((mousey()<height*SquareSize+240)/2+40)) {
+            else if ((mousex()>(width*SquareSize+240)/2-30) && (mousex()<(width*SquareSize+240)/2+30) && (mousey()>(height*SquareSize+240)/2+10) && (mousey()<(height*SquareSize+240)/2+40)) {
                 playAgain=false;
                 isPlaying=false;
                 againHeight=height;
