@@ -8,9 +8,12 @@ using namespace std;
 
 ifstream fin;
 ofstream fout;
+vector<pair<int,int>> bombsPos;
+bool playAgain;
+bool isPlaying;
+int againHeight, againWidth, againBombs;
 
 void menu() {
-    closegraph();
     initwindow(600,600,"MineSweeper");
     char a[20]="MINE SWEEPER";
     char b[20]="NEW GAME";
@@ -28,17 +31,17 @@ void menu() {
     outtextxy(240,370,d);
     outtextxy(280,410,e);   
     while (1) {
-        // GetCursorPos(&mouse);
         if (MouseLeft()) {
-            // GetCursorPos(&mouse);
-            if (mousex()>220 && mousex()<380 && mousey()>290 && mousey()<330) newGame();
+            if (mousex()>220 && mousex()<380 && mousey()>290 && mousey()<330) {
+                newGame();
+                break;
+            }
             else if (mousex()>180 && mousex()<440 && mousey()>330 && mousey()<360) loadGame();
-            else if (mousex()>215 && mousex()<385 && mousey()>360 && mousey()<400) cout << "HIGH SCORE" << endl;
+            else if (mousex()>215 && mousex()<385 && mousey()>360 && mousey()<400) highScoreDisplay();
             else if (mousex()>255 && mousex()<345 && mousey()>400 && mousey()<440) cout << "EXIT" << endl;
         }
         delay(100);
     }
-    getch();
     closegraph();
 }
 
@@ -66,16 +69,19 @@ void newGame() {
                 createDisplay(9,9,10);
                 createAnswer(9,9,10);
                 play(9,9,10);
+                break;
             }
             else if (mousex()>180 && mousex()<440 && mousey()>330 && mousey()<360) {
                 createDisplay(16,16,40);
                 createAnswer(16,16,40);
                 play(16,16,40);
+                break;
             }
             else if (mousex()>215 && mousex()<385 && mousey()>360 && mousey()<400) {
                 createDisplay(16,30,99);
                 createAnswer(16,30,99);
                 play(16,30,99);
+                break;
             }
             else if (mousex()>255 && mousex()<345 && mousey()>400 && mousey()<440) cout << "EXIT" << endl;
         }
@@ -85,7 +91,6 @@ void newGame() {
 
 void createDisplay(int height, int width,int bombs) {
     closegraph();
-    SquareSize=40;
     initwindow(width*SquareSize+240, height*SquareSize+240, "MineSweeper");
     for (int i=0;i<height;i++) {
         for (int j=0;j<width;j++) {
@@ -164,6 +169,7 @@ void openNumCell(int x, int y) {
 }
 
 void openBlankCell(int i, int j, int height, int width) {
+    if (checkBlankCell[i][j]) return;
     if (i<0|| i>height-1 || j<0 || j>width-1) return;
     else if ((answer[i][j]==' ') && (checkBlankCell[i][j]==false)) {
         readimagefile("images\\num0.jpg",j*SquareSize+120,i*SquareSize+120,j*SquareSize+120+SquareSize,i*SquareSize+120+SquareSize);
@@ -186,24 +192,11 @@ void openBlankCell(int i, int j, int height, int width) {
         openBlankCell(i+1,j-1,height,width);
         openBlankCell(i+1,j+1,height,width);
     } 
-    else if (answer[i][j]=='B') return;
-    else  {
+    else {
+        checkBlankCell[i][j]=true;
         openNumCell(i,j);
         return;
     }
-}
-
-void loseGame(int x, int y,int height, int width) {
-    readimagefile("images\\bomb.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
-    delay(500);
-    for (int i=0;i<height;i++) {
-        for (int j=0;j<width;j++) {
-            if (answer[i][j]=='B') readimagefile("images\\bomb.jpg",j*SquareSize+120,i*SquareSize+120,j*SquareSize+120+SquareSize,i*SquareSize+120+SquareSize);
-        }
-    }
-    char a[20]="YOU LOSE";
-    settextstyle(EUROPEAN_FONT,HORIZ_DIR,5);
-    outtextxy((width*SquareSize+240)/2-140,height*SquareSize+240-90,a);
 }
 
 bool checkWin(int height, int width, int bombs) {
@@ -220,7 +213,7 @@ bool checkWin(int height, int width, int bombs) {
     return checkwin;
 }
 
-void clickOpenedNumCell(int x, int y, int height, int width) {
+void clickOpenedNumCell(int x, int y, int height, int width,int bombs) {
     int countFlag=0;
     for (int i=x-1;i<=x+1;i++) {
         for (int j=y-1;j<=y+1;j++) {
@@ -232,7 +225,10 @@ void clickOpenedNumCell(int x, int y, int height, int width) {
             for (int j=y-1;j<=y+1;j++) {
                 if (display[i][j]=='P') continue;
                 if (answer[i][j]==' ') openBlankCell(i,j,height,width);
-                else if (answer[i][j]=='B') loseGame(i,j,height,width);
+                else if (answer[i][j]=='B') {
+                    loseGame(i,j,height,width,bombs);
+                    break;
+                }
                 else openNumCell(i,j);
             }
         }
@@ -245,11 +241,17 @@ clock_t Timer(clock_t time_since_epoch, clock_t now) {
 }
 
 void play(int height, int width, int bombs) {
-    int t;
+    isPlaying=true;
+    int x,y,t;
+    playAgain=false;
     char a[20];
     clock_t time_since_epoch=clock();
-    int x,y;
+    bombsPos.clear();
+    for (int i=0;i<height;i++) {
+        for (int j=0;j<width;j++) if (answer[i][j]=='B') bombsPos.push_back(make_pair(i,j));
+    }
     while(1) {
+        if (checkLose) break;
         t=Time+Timer(time_since_epoch,clock());
         fout.open("data\\statistic.txt");
         fout << height << endl << width << endl << bombs << endl << t << endl << countMark << endl <<countMarkMatchBombs;
@@ -269,10 +271,10 @@ void play(int height, int width, int bombs) {
             x=(mousey()-120)/SquareSize;
             y=(mousex()-120)/SquareSize;
             if (display[x][y]=='P') continue;
-            else if (display[x][y]!='*') clickOpenedNumCell(x,y,height,width);
+            else if (display[x][y]!='*') clickOpenedNumCell(x,y,height,width,bombs);
             if (answer[x][y]==' ') openBlankCell(x,y,height,width);
             else if (answer[x][y]=='B') {
-                loseGame(x,y,height,width);
+                loseGame(x,y,height,width,bombs);
                 break;
             }
             else openNumCell(x,y);
@@ -312,7 +314,48 @@ void play(int height, int width, int bombs) {
                 fout.open("data\\statistic.txt");
                 fout << 0;
                 fout.close();
+                highScoreSave(t,height,width,bombs);
                 break;
+            }
+        }
+    }
+}
+
+void loseGame(int x, int y,int height, int width, int bombs) {
+    readimagefile("images\\bomb.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
+    delay(500);
+    for (int i=0;i<bombsPos.size();i++) readimagefile("images\\bomb.jpg",bombsPos[i].second*SquareSize+120,bombsPos[i].first*SquareSize+120,bombsPos[i].second*SquareSize+120+SquareSize,bombsPos[i].first*SquareSize+120+SquareSize);
+    char a[20]="YOU LOSE";
+    settextstyle(3,HORIZ_DIR,5);
+    outtextxy((width*SquareSize+240)/2-130,height*SquareSize+240-90,a);
+    checkLose=true;
+    fout.open("data\\statistic.txt");
+    fout << 0;
+    fout.close();
+    delay(2500);
+    cleardevice();
+    char b[40]="DO YOU WANT TO PLAY AGAIN?";
+    char c[4]="YES";
+    char d[3]="NO";
+    settextstyle(3,HORIZ_DIR,3);
+    outtextxy((width*SquareSize+240)/2-150,(height*SquareSize+240)/2-80,b);
+    outtextxy((width*SquareSize+240)/2-20,(height*SquareSize+240)/2-20,c);
+    outtextxy((width*SquareSize+240)/2-15,(height*SquareSize+240)/2+20,d);
+    while (isPlaying) {
+        if (MouseLeft()) {
+            if ((mousex()>(width*SquareSize+240)/2-40) && (mousex()<(width*SquareSize+240)/2+40) && ((mousey()>height*SquareSize+240)/2-20) && ((mousey()<height*SquareSize+240)/2+10)) {
+                playAgain=true;
+                isPlaying=false;
+                againHeight=height;
+                againWidth=width;
+                againBombs=bombs;
+            }
+            else if ((mousex()>(width*SquareSize+240)/2-30) && (mousex()<(width*SquareSize+240)/2+30) && ((mousey()>height*SquareSize+240)/2+10) && ((mousey()<height*SquareSize+240)/2+40)) {
+                playAgain=false;
+                isPlaying=false;
+                againHeight=height;
+                againWidth=width;
+                againBombs=bombs;
             }
         }
     }
@@ -356,4 +399,51 @@ void loadGame() {
         }
         play(height,width,bombs);
     }
+}
+
+void highScoreSave(int data, int height, int width, int bombs) {
+    if (height==9 && width==9 && bombs==10) fin.open("data\\highscore\\beginner.txt");
+    else if (height==16 && width==16 && bombs==40) fin.open("data\\highscore\\intermidiate.txt");
+    else if (height==9 && width==9 && bombs==10) fin.open("data\\highscore\\beginner.txt");
+    int i=0, index;
+    while(!fin.eof()) {
+        fin >> highscore[i];
+        i++;
+    }
+    if (highscore[0]==0) highscore[0]=999999999;
+    fin.close();
+    for (int i=0;i<5;i++) {
+        if (data<highscore[i]) {
+            index=i;
+            break;
+        }
+    }
+    for (int i=4;i>index;i--) {
+        highscore[i]=highscore[i-1];
+    }
+    highscore[index]=data;
+    if (height==9 && width==9 && bombs==10) fout.open("data\\highscore\\beginner.txt");
+    else if (height==16 && width==16 && bombs==40) fout.open("data\\highscore\\intermidiate.txt");
+    else if (height==9 && width==9 && bombs==10) fout.open("data\\highscore\\beginner.txt");
+    for (int i=0;i<5;i++) {
+        fout << highscore[i] << endl;
+        highscore[i]=0;
+    }
+    fout.close();
+}
+
+void highScoreDisplay() {
+    cleardevice();
+    int temp;
+    char a[20];
+    char b[20];
+    fin.open("data\\highscore\\beginner.txt");
+    for (int i=0;i<5;i++) {
+        fin >> temp;
+        sprintf(a,"TOP %d. ",i+1);
+        sprintf(b,"%d",temp);
+        outtextxy(200,i*40+200,a);
+        outtextxy(280,i*40+200,b);
+    }
+    fin.close();
 }
