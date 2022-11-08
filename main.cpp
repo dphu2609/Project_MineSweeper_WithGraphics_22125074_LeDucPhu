@@ -6,12 +6,11 @@ int main() {
             checkLose=false;
             countMark=0;
             countMarkMatchBombs=0;
-            if (playAgain) {
-                createDisplay(againHeight,againWidth,againBombs);
-                createAnswer(againHeight,againWidth,againBombs);
-                play(againHeight,againWidth,againBombs);
+            if (playAgain) PlayGame(againHeight,againWidth,againBombs);
+            else {
+                closegraph();
+                menu();
             }
-            else menu();
         }   
     }
     return 0;

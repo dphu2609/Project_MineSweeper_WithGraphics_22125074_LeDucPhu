@@ -28,3 +28,5 @@ void clickOpenedNumCell(int x, int y, int height, int width,int bombs);
 void highScoreSave(int data, int height, int width, int bombs);
 void highScoreDisplay();
 void PlayAgain(int height, int width, int bombs);
+void PlayGame(int height,int width, int bombs);
+void custom();

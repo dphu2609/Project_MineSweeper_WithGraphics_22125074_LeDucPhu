@@ -43,7 +43,7 @@ void menu() {
                 highScoreDisplay();
                 break;
             }
-            else if (mousex()>255 && mousex()<345 && mousey()>400 && mousey()<440) cout << "EXIT" << endl;
+            else if (mousex()>255 && mousex()<345 && mousey()>400 && mousey()<440) exit(0);
         }
         delay(100);
     }
@@ -67,24 +67,21 @@ void newGame() {
     while (1) {
         if (MouseLeft()) {
             if (mousex()>220 && mousex()<380 && mousey()>290 && mousey()<330) {
-                createDisplay(9,9,10);
-                createAnswer(9,9,10);
-                play(9,9,10);
+                PlayGame(9,9,10);
                 break;
             }
             else if (mousex()>180 && mousex()<440 && mousey()>330 && mousey()<360) {
-                createDisplay(16,16,10);
-                createAnswer(16,16,10);
-                play(16,16,10);
+                PlayGame(16,16,40);
                 break;
             }
             else if (mousex()>215 && mousex()<385 && mousey()>360 && mousey()<400) {
-                createDisplay(16,30,20);
-                createAnswer(16,30,20);
-                play(16,30,20);
+                PlayGame(16,30,99);
                 break;
             }
-            else if (mousex()>255 && mousex()<345 && mousey()>400 && mousey()<440) cout << "EXIT" << endl;
+            else if (mousex()>255 && mousex()<345 && mousey()>400 && mousey()<440) {
+                custom();
+                break;
+            }
         }
         delay(100);
     }
@@ -102,6 +99,7 @@ void createDisplay(int height, int width,int bombs) {
 
 void createAnswer(int height, int width, int bombs) {
     srand(time(0));
+    bombsPos.clear();
     for (int i=0;i<50;i++) {
         for (int j=0;j<50;j++) {
             checkBlankCell[i][j]=false;
@@ -119,6 +117,7 @@ void createAnswer(int height, int width, int bombs) {
             checkRandomBombs[i][j]=true;
             count++;
             answer[i][j]='B';
+            bombsPos.push_back(make_pair(i,j));
         }
     }
     for (int i=0;i<height;i++) {
@@ -136,10 +135,6 @@ void createAnswer(int height, int width, int bombs) {
             if (count==0) answer[i][j]='.';
             else answer[i][j]=count+48;
         }
-    }
-    bombsPos.clear();
-    for (int i=0;i<height;i++) {
-        for (int j=0;j<width;j++) if (answer[i][j]=='B') bombsPos.push_back(make_pair(i,j));
     }
     fout.open("data\\answer.txt");
     for (int i=0;i<height;i++) {
@@ -359,7 +354,7 @@ void PlayAgain(int height, int width, int bombs) {
 void loseGame(int x, int y,int height, int width, int bombs) {
     readimagefile("images\\bomb.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
     delay(500);
-    for (int i=0;i<bombsPos.size();i++) readimagefile("images\\bomb.jpg",bombsPos[i].second*SquareSize+120,bombsPos[i].first*SquareSize+120,bombsPos[i].second*SquareSize+120+SquareSize,bombsPos[i].first*SquareSize+120+SquareSize);
+    for (int i=0;i<bombs;i++) readimagefile("images\\bomb.jpg",bombsPos[i].second*SquareSize+120,bombsPos[i].first*SquareSize+120,bombsPos[i].second*SquareSize+120+SquareSize,bombsPos[i].first*SquareSize+120+SquareSize);
     char a[20]="YOU LOSE";
     settextstyle(3,HORIZ_DIR,5);
     outtextxy((width*SquareSize+240)/2-130,height*SquareSize+240-90,a);
@@ -543,5 +538,68 @@ void highScoreDisplay() {
         }
         page=1-page;
         delay(50);
+    }
+} 
+
+void PlayGame(int height,int width, int bombs) {
+    createDisplay(height,width,bombs);
+    createAnswer(height,width,bombs);
+    play(height,width,bombs);
+}
+
+void custom() {
+    cleardevice();
+    char a[20]="SIZE: ";
+    char b[20]="BOMBS: ";
+    char c[20];
+    char d[20]; 
+    char e[20];
+    char f[20]="CONFIRM";
+    settextstyle(3,HORIZ_DIR,4);
+    outtextxy(150,200,a);
+    outtextxy(150,350,b);
+    settextstyle(3,HORIZ_DIR,3);
+    outtextxy(270,500,f);
+    readimagefile("images\\arrow_up.jpg",300,170,320,190);
+    readimagefile("images\\arrow_up.jpg",355,170,375,190);
+    readimagefile("images\\arrow_down.jpg",300,240,320,260);
+    readimagefile("images\\arrow_down.jpg",355,240,375,260);
+    readimagefile("images\\arrow_up.jpg",345,320,365,340);
+    readimagefile("images\\arrow_down.jpg",345,390,365,410);
+    int height=2,width=2,bombs=1;
+    settextstyle(3,HORIZ_DIR,4);
+    while (1) {
+        delay(100);
+        if (height<2) height=16;
+        if (width<2) width=30;
+        if (height>16) height=2;
+        if (width>30) width=2;
+        if (bombs>height*width) bombs=1;
+        if (bombs<1) bombs=height*width;
+        if (height<10) sprintf(c,"  %d x",height);
+        else sprintf(c,"%d x",height);
+        if (width<10) sprintf(d,"%d  ",width);
+        else sprintf(d,"%d",width);
+        sprintf(e,"  %d    ",bombs);
+        outtextxy(280,200,c);
+        outtextxy(355,200,d);
+        if (bombs<10) outtextxy(325,350,e);
+        else if (bombs<100) outtextxy(315,350,e);
+        else if (bombs<1000) outtextxy(305,350,e);
+        if (MouseLeft()) {
+            if (mousex()>300 && mousex()<320 && mousey()>170&& mousey()<190) height++;
+            else if (mousex()>355 && mousex()<375 && mousey()>170 && mousey()<190) width++;
+            else if (mousex()>300 && mousex()<320 && mousey()>240&& mousey()<260) height--;
+            else if (mousex()>355 && mousex()<375 && mousey()>240 && mousey()<260) width--;
+            else if (mousex()>345 && mousex()<365 && mousey()>320 && mousey()<340) bombs++;
+            else if (mousex()>345 && mousex()<365 && mousey()>390 && mousey()<410) bombs--;
+            else if (mousex()>260 && mousex()<340 && mousey()>500 && mousey()<530) {
+                playAgain=true;
+                againHeight=height;
+                againWidth=width;
+                againBombs=bombs;
+                break;
+            }
+        }
     }
 }
