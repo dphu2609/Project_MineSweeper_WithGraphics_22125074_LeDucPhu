@@ -1,12 +1,11 @@
-bool checkRandomBombs[16][30];
-bool checkBlankCell[16][30];
-char display[16][30];
-char answer[16][30];
-int SquareSize=40;
+bool checkRandomBombs[50][50];
+bool checkBlankCell[50][50];
+char display[50][50];
+char answer[50][50];
+int SquareSize=30;
 int countMark;
 int countMarkMatchBombs;
 clock_t Time;
-int highscore[10];
 bool checkLose=false;
 
 const int MAX_HEIGHT=16;
@@ -28,3 +27,4 @@ bool checkWin(int height, int width, int bombs);
 void clickOpenedNumCell(int x, int y, int height, int width,int bombs);
 void highScoreSave(int data, int height, int width, int bombs);
 void highScoreDisplay();
+void PlayAgain(int height, int width, int bombs);
