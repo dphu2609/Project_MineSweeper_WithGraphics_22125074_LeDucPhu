@@ -51,7 +51,7 @@ void menu() {
 
 void newGame() {
     cleardevice();
-    delay(100);
+    delay(200);
     char a[20]="CHOOSE DIFFICULTY";
     char b[20]="BEGINNER";
     char c[20]="INTERMIDIATE";
@@ -104,8 +104,13 @@ void createAnswer(int height, int width, int bombs) {
         for (int j=0;j<50;j++) {
             checkBlankCell[i][j]=false;
             checkRandomBombs[i][j]=false;
-            display[i][j]='*';
+            display[i][j]='.';
             answer[i][j]='.';
+        }
+    }
+    for (int i=0;i<height;i++) {
+        for (int j=0;j<width;j++) {
+            display[i][j]='*';
         }
     }
     int count = 1;
@@ -285,7 +290,7 @@ void play(int height, int width, int bombs) {
             if (display[x][y]!='*' && display[x][y]!='P') continue;
             else if (display[x][y]=='P') {
                 display[x][y]='*';
-                readimagefile("images\\unopened.gif",y*SquareSize+121,x*SquareSize+121,y*SquareSize+119+SquareSize,x*SquareSize+119+SquareSize);
+                readimagefile("images\\unopened.gif",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
                 countMark--;
                 if (answer[x][y]=='B') countMarkMatchBombs--;
             }
@@ -402,6 +407,12 @@ void loadGame() {
                 else if (display[i][j]!='*') openNumCell(i,j);
             }
         }
+        bombsPos.clear();
+        for (int i=0;i<height;i++) {
+            for (int j=0;j<width;j++) {
+                if (answer[i][j]=='B') bombsPos.push_back(make_pair(i,j));
+            }
+        }
         play(height,width,bombs);
     }
 }
@@ -432,7 +443,7 @@ void highScoreSave(int data, int height, int width, int bombs) {
 }
 
 void highScoreDisplay() {
-    delay(100);
+    delay(200);
     char a[20]="HIGHSCORE BOARD";
     char b[20]="BEGINNER";
     char c[20]="INTERMIDIATE";
@@ -451,6 +462,7 @@ void highScoreDisplay() {
         outtextxy(250,450,e);  
         if (MouseLeft()) {
             if (mousex()>220 && mousex()<380 && mousey()>290 && mousey()<330) {
+                delay(200);
                 while(1) {
                     setactivepage(page);
                     setvisualpage(1-page);
@@ -478,6 +490,7 @@ void highScoreDisplay() {
                 }
             }
             else if (mousex()>180 && mousex()<440 && mousey()>330 && mousey()<360) {
+                delay(200);
                 while(1) {
                     setactivepage(page);
                     setvisualpage(1-page);
@@ -505,6 +518,7 @@ void highScoreDisplay() {
                 }
             }
             else if (mousex()>215 && mousex()<385 && mousey()>360 && mousey()<400) {
+                delay(200);
                 while(1) {
                     setactivepage(page);
                     setvisualpage(1-page);
@@ -581,7 +595,8 @@ void custom() {
         if (width<10) sprintf(d,"%d  ",width);
         else sprintf(d,"%d",width);
         sprintf(e,"  %d    ",bombs);
-        outtextxy(280,200,c);
+        if (height<10) outtextxy(283,200,c);
+        else outtextxy(280,200,c);
         outtextxy(355,200,d);
         if (bombs<10) outtextxy(325,350,e);
         else if (bombs<100) outtextxy(315,350,e);
