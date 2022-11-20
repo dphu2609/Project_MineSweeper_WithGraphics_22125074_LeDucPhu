@@ -16,12 +16,14 @@ int page;
 vector<int> highscore;
 
 void menu() {
+    delay(100);
     initwindow(600,600,"MineSweeper");
     char a[20]="MineSweeper";
     char b[20]="NEW GAME";
     char c[20]="CONTINUE PLAYING";
     char d[20]="HIGH SCORE";
     char e[20]="EXIT";
+    char f[40]="designed by Phus";
     settextstyle(10,HORIZ_DIR,7);
     outtextxy(90,170,a);
     settextstyle(3,HORIZ_DIR,3);
@@ -29,6 +31,8 @@ void menu() {
     outtextxy(205,330,c);
     outtextxy(240,370,d);
     outtextxy(280,410,e);   
+    settextstyle(5,HORIZ_DIR,4);
+    outtextxy(170,550,f);  
     while (1) {
         if (MouseLeft()) {
             if (mousex()>220 && mousex()<380 && mousey()>290 && mousey()<330) {
@@ -51,7 +55,7 @@ void menu() {
 
 void newGame() {
     cleardevice();
-    delay(200);
+    delay(150);
     char a[20]="CHOOSE DIFFICULTY";
     char b[20]="BEGINNER";
     char c[20]="INTERMIDIATE";
@@ -64,6 +68,9 @@ void newGame() {
     outtextxy(225,330,c);
     outtextxy(255,370,d);
     outtextxy(250,410,e);   
+    settextstyle(5,HORIZ_DIR,4);
+    char f[40]="designed by Phus";
+    outtextxy(170,550,f);  
     while (1) {
         if (MouseLeft()) {
             if (mousex()>220 && mousex()<380 && mousey()>290 && mousey()<330) {
@@ -449,6 +456,7 @@ void highScoreDisplay() {
     char c[20]="INTERMIDIATE";
     char d[20]="EXPERT";
     char e[20]="RETURN";
+    char f[40]="designed by Phus";
     while (1) {
         setactivepage(page);
         setvisualpage(1-page);
@@ -460,9 +468,12 @@ void highScoreDisplay() {
         outtextxy(225,330,c);
         outtextxy(255,370,d);
         outtextxy(250,450,e);  
+        settextstyle(5,HORIZ_DIR,4);
+        outtextxy(170,550,f);  
+        settextstyle(3,HORIZ_DIR,3);
         if (MouseLeft()) {
             if (mousex()>220 && mousex()<380 && mousey()>290 && mousey()<330) {
-                delay(200);
+                delay(100);
                 while(1) {
                     setactivepage(page);
                     setvisualpage(1-page);
@@ -475,8 +486,8 @@ void highScoreDisplay() {
                         fin >> temp;
                         sprintf(f,"TOP %d. ",i+1);
                         sprintf(g,"%d",temp);
-                        outtextxy(200,i*40+200,f);
-                        outtextxy(280,i*40+200,g);
+                        outtextxy(235,i*40+200,f);
+                        outtextxy(315,i*40+200,g);
                     }
                     fin.close();
                     outtextxy(250,450,e);   
@@ -490,7 +501,7 @@ void highScoreDisplay() {
                 }
             }
             else if (mousex()>180 && mousex()<440 && mousey()>330 && mousey()<360) {
-                delay(200);
+                delay(100);
                 while(1) {
                     setactivepage(page);
                     setvisualpage(1-page);
@@ -503,8 +514,8 @@ void highScoreDisplay() {
                         fin >> temp;
                         sprintf(f,"TOP %d. ",i+1);
                         sprintf(g,"%d",temp);
-                        outtextxy(200,i*40+200,f);
-                        outtextxy(280,i*40+200,g);
+                        outtextxy(235,i*40+200,f);
+                        outtextxy(315,i*40+200,g);
                     }
                     fin.close();
                     outtextxy(250,450,e);   
@@ -518,7 +529,7 @@ void highScoreDisplay() {
                 }
             }
             else if (mousex()>215 && mousex()<385 && mousey()>360 && mousey()<400) {
-                delay(200);
+                delay(100);
                 while(1) {
                     setactivepage(page);
                     setvisualpage(1-page);
@@ -531,8 +542,8 @@ void highScoreDisplay() {
                         fin >> temp;
                         sprintf(f,"TOP %d. ",i+1);
                         sprintf(g,"%d",temp);
-                        outtextxy(200,i*40+200,f);
-                        outtextxy(280,i*40+200,g);
+                        outtextxy(235,i*40+200,f);
+                        outtextxy(315,i*40+200,g);
                     }
                     fin.close();
                     outtextxy(250,450,e);   
@@ -578,8 +589,8 @@ void custom() {
     readimagefile("images\\arrow_up.jpg",355,170,375,190);
     readimagefile("images\\arrow_down.jpg",300,240,320,260);
     readimagefile("images\\arrow_down.jpg",355,240,375,260);
-    readimagefile("images\\arrow_up.jpg",345,320,365,340);
-    readimagefile("images\\arrow_down.jpg",345,390,365,410);
+    readimagefile("images\\arrow_up.jpg",342,320,362,340);
+    readimagefile("images\\arrow_down.jpg",342,390,362,410);
     int height=2,width=2,bombs=1;
     settextstyle(3,HORIZ_DIR,4);
     while (1) {
