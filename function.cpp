@@ -87,7 +87,7 @@ void newGame() {
     }
 }
 
-void createDisplay(int height, int width,int bombs) {
+void createDisplay(const int height, const int width, const int bombs) {
     closegraph();
     initwindow(width*SquareSize+240, height*SquareSize+240, "MineSweeper");
     for (int i=0;i<height;i++) {
@@ -97,7 +97,7 @@ void createDisplay(int height, int width,int bombs) {
     }
 }
 
-void createAnswer(int height, int width, int bombs) {
+void createAnswer(const int height, const int width, const int bombs) {
     srand(time(0));
     bombsPos.clear();
     for (int i=0;i<50;i++) {
@@ -172,7 +172,7 @@ void openNumCell(int x, int y) {
     else if (answer[x][y]=='8') readimagefile("images\\num8.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
 }
 
-void openBlankCell(int i, int j, int height, int width) {
+void openBlankCell(int i, int j, const int height, const int width) {
     if (checkBlankCell[i][j]) return;
     if (i<0 || i>height-1 || j<0 || j>width-1) return;
     else if ((answer[i][j]=='.') && (checkBlankCell[i][j]==false)) {
@@ -203,7 +203,7 @@ void openBlankCell(int i, int j, int height, int width) {
     }
 }
 
-bool checkWin(int height, int width, int bombs) {
+bool checkWin(const int height, const int width, const int bombs) {
     bool checkwin=1;
     for (int i=0;i<height;i++) {
         for (int j=0;j<width;j++) {
@@ -217,7 +217,7 @@ bool checkWin(int height, int width, int bombs) {
     return checkwin;
 }
 
-void clickOpenedNumCell(int x, int y, int height, int width,int bombs) {
+void clickOpenedNumCell(int x, int y, const int height, const int width,const int bombs) {
     int countFlag=0;
     for (int i=x-1;i<=x+1;i++) {
         for (int j=y-1;j<=y+1;j++) {
@@ -244,7 +244,7 @@ clock_t Timer(clock_t time_since_epoch, clock_t now) {
     return (int)(now-time_since_epoch)/1000;
 }
 
-void play(int height, int width, int bombs) {
+void play(const int height, const int width, const int bombs) {
     delay(500);
     isPlaying=true;
     int x,y,t;
@@ -252,6 +252,7 @@ void play(int height, int width, int bombs) {
     char a[20];
     clock_t time_since_epoch=clock();
     while(1) {
+        delay(50);
         if (checkLose) break;
         t=Time+Timer(time_since_epoch,clock());
         fout.open("data\\statistic.txt");
@@ -265,7 +266,6 @@ void play(int height, int width, int bombs) {
         else if (t<10000) outtextxy((width*SquareSize+240)/2-40,60,a);
         else if (t<100000) outtextxy((width*SquareSize+240)/2-50,60,a);
         else if (t<1000000) outtextxy((width*SquareSize+240)/2-60,60,a);
-        delay(100);
         if (MouseLeft()) {
             delay(50);
             if (mousex()-120 < 0) continue;
@@ -325,7 +325,7 @@ void play(int height, int width, int bombs) {
     }
 }
 
-void PlayAgain(int height, int width, int bombs) {
+void PlayAgain(const int height, const int width, const int bombs) {
     char b[40]="DO YOU WANT TO PLAY AGAIN?";
     char c[4]="YES";
     char d[3]="NO";
@@ -356,17 +356,17 @@ void PlayAgain(int height, int width, int bombs) {
     }
 }
 
-void loseGame(int x, int y,int height, int width, int bombs) {
+void loseGame(int x, int y, const int height, const int width,const int bombs) {
     readimagefile("images\\bomb.jpg",y*SquareSize+120,x*SquareSize+120,y*SquareSize+120+SquareSize,x*SquareSize+120+SquareSize);
+    fout.open("data\\statistic.txt");
+    fout << 0;
+    fout.close();
+    checkLose=true;
     delay(500);
     for (int i=0;i<bombs;i++) readimagefile("images\\bomb.jpg",bombsPos[i].second*SquareSize+120,bombsPos[i].first*SquareSize+120,bombsPos[i].second*SquareSize+120+SquareSize,bombsPos[i].first*SquareSize+120+SquareSize);
     char a[20]="YOU LOSE";
     settextstyle(3,HORIZ_DIR,5);
     outtextxy((width*SquareSize+240)/2-130,height*SquareSize+240-90,a);
-    checkLose=true;
-    fout.open("data\\statistic.txt");
-    fout << 0;
-    fout.close();
     delay(2500);
     PlayAgain(height, width, bombs);
 }
@@ -417,7 +417,7 @@ void loadGame() {
     }
 }
 
-void highScoreSave(int data, int height, int width, int bombs) {
+void highScoreSave(int data, const int height, const int width, const int bombs) {
     if (height==9 && width==9 && bombs==10) fin.open("data\\highscore\\beginner.txt");
     else if (height==16 && width==16 && bombs==40) fin.open("data\\highscore\\intermidiate.txt");
     else if (height==9 && width==9 && bombs==10) fin.open("data\\highscore\\beginner.txt");
@@ -555,7 +555,7 @@ void highScoreDisplay() {
     }
 } 
 
-void PlayGame(int height,int width, int bombs) {
+void PlayGame(const int height,const int width,const int bombs) {
     createDisplay(height,width,bombs);
     createAnswer(height,width,bombs);
     play(height,width,bombs);
