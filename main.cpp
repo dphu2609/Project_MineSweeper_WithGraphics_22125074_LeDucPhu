@@ -8,10 +8,9 @@ int main() {
             countMarkMatchBombs=0;
             if (playAgain) PlayGame(againHeight,againWidth,againBombs);
             else {
-                closegraph();
                 menu();
             }
         }   
     }
     return 0;
-}
+}  

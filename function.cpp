@@ -6,16 +6,33 @@
 
 using namespace std;
 
-ifstream fin;
-ofstream fout;
+bool checkRandomBombs[50][50];
+bool checkBlankCell[50][50];
+char display[50][50];
+char answer[50][50];
+int SquareSize=30;
+clock_t Time;
 vector<pair<int,int>> bombsPos;
+vector<int> highscore;
 bool playAgain;
 bool isPlaying;
 int againHeight, againWidth, againBombs;
 int page;
-vector<int> highscore;
+int countMark;
+int countMarkMatchBombs;
+bool checkLose=false;
+
+const int MAX_HEIGHT=16;
+const int MAX_WIDTH=30;
+
+#define MouseLeft() GetAsyncKeyState(VK_LBUTTON)
+#define MouseRight() GetAsyncKeyState(VK_RBUTTON)
+
+ifstream fin;
+ofstream fout;
 
 void menu() {
+    closegraph();
     delay(100);
     initwindow(600,600,"MineSweeper");
     char a[20]="MineSweeper";
