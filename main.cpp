@@ -1,5 +1,8 @@
 #include "function.cpp"
+#include "gameplay.cpp"
+
 using namespace std;
+
 int main() {
     while(1) {
         if (isPlaying==false) {
@@ -7,9 +10,7 @@ int main() {
             countMark=0;
             countMarkMatchBombs=0;
             if (playAgain) PlayGame(againHeight,againWidth,againBombs);
-            else {
-                menu();
-            }
+            else menu();
         }   
     }
     return 0;
