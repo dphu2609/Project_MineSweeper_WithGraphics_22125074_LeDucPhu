@@ -89,24 +89,28 @@ void openNumCell(int x, int y) {
 }
 
 void openBlankCell(int i, int j, const int height, const int width) {
-    if (checkOpenedCell[i][j]) return;
-    if (i<0 || i>height-1 || j<0 || j>width-1) return;
-    else if (answer[i][j]=='.') {
-        checkOpenedCell[i][j]=true;
-        readimagefile("images\\num0.jpg", j*SquareSize+120, i*SquareSize+120, j*SquareSize+120+SquareSize, i*SquareSize+120+SquareSize);
-        display[i][j]=answer[i][j];
-        openBlankCell(i,j-1,height,width);
-        openBlankCell(i,j+1,height,width);
-        openBlankCell(i+1,j,height,width);
-        openBlankCell(i-1,j,height,width);
-        openBlankCell(i-1,j-1,height,width);
-        openBlankCell(i-1,j+1,height,width);
-        openBlankCell(i+1,j-1,height,width);
-        openBlankCell(i+1,j+1,height,width);
-    } 
-    else {
-        openNumCell(i,j);
-        return;
+    int x, y;
+    queue<pair<int, int>> q;
+    q.push({i,j});
+    while (!q.empty()) {
+        x = q.front().first;
+        y = q.front().second;
+        q.pop();
+        if (x < 0 || x > height-1 || y < 0 || y > width-1) continue;
+        if (checkOpenedCell[x][y]) continue;
+        if (answer[x][y] == '.') {
+            checkOpenedCell[x][y] = true;
+            display[x][y] = answer[x][y];
+            readimagefile("images\\num0.jpg", y*SquareSize+120, x*SquareSize+120,
+                y*SquareSize+120+SquareSize, x*SquareSize+120+SquareSize);
+            for (int m = x - 1; m <= x + 1; m++) {
+                for (int n = y - 1; n <= y + 1; n++) {
+                    if (m == x && n == y) continue;
+                    q.push({m, n});
+                }
+            }
+        }
+        else openNumCell(x,y);
     }
 }
 
