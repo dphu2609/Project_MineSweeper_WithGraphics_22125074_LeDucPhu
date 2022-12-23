@@ -1,5 +1,4 @@
-#ifndef FUNCTION
-#define FUNCTION
+#pragma once
 
 #include <bits/stdc++.h>
 #include <fstream>
@@ -43,4 +42,4 @@ void highScoreDisplay();
 void PlayAgain(const int height, const int width, const int bombs);
 void PlayGame(const int height,const int width,const int bombs);
 void custom();
-#endif
+int Timer(clock_t time_since_epoch, clock_t now);

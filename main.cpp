@@ -1,4 +1,4 @@
-#include "function.cpp"
+#include "menu.cpp"
 #include "gameplay.cpp"
 
 using namespace std;
@@ -9,7 +9,7 @@ int main() {
             checkLose=false;
             countMark=0;
             countMarkMatchBombs=0;
-            if (playAgain) PlayGame(againHeight,againWidth,againBombs);
+            if (playAgain) PlayGame(againHeight, againWidth, againBombs);
             else menu();
         }   
     }

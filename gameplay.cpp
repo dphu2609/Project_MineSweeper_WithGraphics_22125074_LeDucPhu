@@ -151,7 +151,7 @@ bool checkWin(const int height, const int width, const int bombs) {
     return checkwin;
 }
 
-clock_t Timer(clock_t time_since_epoch, clock_t now) {
+int Timer(clock_t time_since_epoch, clock_t now) {
     return (int)(now-time_since_epoch)/1000;
 }
 
@@ -159,8 +159,10 @@ void play(const int height, const int width, const int bombs) {
     delay(500);
     isPlaying=true;
     playAgain=false;
-    int x,y,t;
-    char a[20];
+    int x, y, t, f = bombs + 1;
+    char a[20]; //store time
+    char flag[20];
+    char space[20] = "                ";
     clock_t time_since_epoch=clock();
     while(1) {
         delay(50);
@@ -177,6 +179,14 @@ void play(const int height, const int width, const int bombs) {
         else if (t<10000) outtextxy((width*SquareSize+240)/2-40,60,a);
         else if (t<100000) outtextxy((width*SquareSize+240)/2-50,60,a);
         else if (t<1000000) outtextxy((width*SquareSize+240)/2-60,60,a);
+        if (bombs - countMark != f) 
+        {   outtextxy((width*SquareSize+240)/2-30,120 + SquareSize*height + 30, space);
+            f = bombs - countMark;
+            sprintf(flag, "%d", f);
+            if (f<10) outtextxy((width*SquareSize+240)/2-5,120 + SquareSize*height + 30, flag);
+            else if (f<100) outtextxy((width*SquareSize+240)/2-10,120 + SquareSize*height + 30, flag);
+            else if (f<1000) outtextxy((width*SquareSize+240)/2-15,120 + SquareSize*height + 30, flag);
+        }
         if (MouseLeft()) {
             delay(50);
             if (mousex()-120 < 0) continue;
@@ -191,11 +201,17 @@ void play(const int height, const int width, const int bombs) {
                 break;
             }
             else openNumCell(x,y);
+            fout.open("data\\display.txt");
+            for (int i=0;i<height;i++) {
+                for (int j=0;j<width;j++) {
+                    fout << display[i][j] << endl;
+                }
+            }
         }
         else if (MouseRight()) {
             delay(50);
-            if (mousex()-120 < 0) continue;
-            if (mousey()-120 < 0) continue;
+            if (mousex()-120 < 0 || mousex() > 120 + width*SquareSize) continue;
+            if (mousey()-120 < 0 || mousey() > 120 + height*SquareSize) continue;
             x=(mousey()-120)/SquareSize;
             y=(mousex()-120)/SquareSize;
             if (display[x][y]!='*' && display[x][y]!='P') continue;
@@ -211,11 +227,11 @@ void play(const int height, const int width, const int bombs) {
                 countMark++;
                 if (answer[x][y]=='B') countMarkMatchBombs++;
             }
-        }
-        fout.open("data\\display.txt");
-        for (int i=0;i<height;i++) {
-            for (int j=0;j<width;j++) {
-                fout << display[i][j] << endl;
+            fout.open("data\\display.txt");
+            for (int i=0;i<height;i++) {
+                for (int j=0;j<width;j++) {
+                    fout << display[i][j] << endl;
+                }
             }
         }
         fout.close();
@@ -242,7 +258,7 @@ void loseGame(int x, int y, const int height, const int width,const int bombs) {
     fout << 0;
     fout.close();
     checkLose=true;
-    Time=0;
+    Time = 0;
     delay(500);
     for (int i=0;i<bombs;i++) readimagefile("images\\bomb.jpg",bombsPos[i].second*SquareSize+120,bombsPos[i].first*SquareSize+120,bombsPos[i].second*SquareSize+120+SquareSize,bombsPos[i].first*SquareSize+120+SquareSize);
     char a[20]="YOU LOSE";
@@ -311,7 +327,8 @@ void loadGame() {
             }
         }
         fin.close();
-        createDisplay(height,width,bombs);
+        closegraph();
+        initwindow(width*SquareSize+240, height*SquareSize+240, "MineSweeper",(getmaxwidth()-(width*SquareSize+240))/2, (getmaxheight()-(height*SquareSize+240))/2);
         for (int i=0;i<height;i++) {
             for (int j=0;j<width;j++) {
                 if (display[i][j]=='P') readimagefile("images\\flag.jpg",j*SquareSize+121,i*SquareSize+121,j*SquareSize+119+SquareSize,i*SquareSize+119+SquareSize);
