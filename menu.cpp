@@ -88,6 +88,7 @@ void highScoreSave(int data, const int height, const int width, const int bombs)
     if (height==9 && width==9 && bombs==10) fin.open("data\\highscore\\beginner.txt");
     else if (height==16 && width==16 && bombs==40) fin.open("data\\highscore\\intermidiate.txt");
     else if (height==9 && width==9 && bombs==10) fin.open("data\\highscore\\beginner.txt");
+    else return;
     int i=0, index;
     while(!fin.eof()) {
         int temp;
